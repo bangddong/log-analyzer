@@ -1,14 +1,14 @@
 package main.java.com.dhbang.listener;
 
+import main.java.com.dhbang.utils.Util;
 import main.java.com.dhbang.view.MainForm;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.rmi.server.ExportException;
 import java.util.HashMap;
 
 import static main.java.com.dhbang.listener.DialogMessage.*;
@@ -20,7 +20,7 @@ import static main.java.com.dhbang.listener.DialogMessage.*;
  * [상태코드][URL][웹 브라우저 구분][호출시간]
  * [200][http://apis.dktechin.net/search/knowledge?apikey=23jf&q=dktechin][IE][2019-06-10 08:00:00]
  *
- * "200"외 다른 요청구분도 필요할시 ONLY_SUCCESS = false
+ * "200"외 다른 요청구분도 필요할시 RESPONSE_CHECK = false
  */
 public class AnalyzeResultBtnListener implements ActionListener, BtnListener {
 
@@ -69,21 +69,16 @@ public class AnalyzeResultBtnListener implements ActionListener, BtnListener {
                 cntServiceId();
                 cntApiKey();
                 cntBrowser();
-
-                for (String key : statusCdCntMap.keySet()) {
-                    System.out.println("[statusCd]" + key + ": " + statusCdCntMap.get(key));
-                }
-                for (String key : serviceIdCntMap.keySet()) {
-                    System.out.println("[serviceId]" + key + ": " + serviceIdCntMap.get(key));
-                }
-                for (String key : apiKeyCntMap.keySet()) {
-                    System.out.println("[apiKey]" + key + ": " + apiKeyCntMap.get(key));
-                }
-                for (String key : browserCntMap.keySet()) {
-                    System.out.println("[browser]" + key + ": " + browserCntMap.get(key));
-                }
             }
 
+            // TODO 분석 결과 오더링 구현
+
+            // TODO 사용자 선택 경로 구현
+            FileDialog dialog = Util.getFileDialog(form, 1, "");
+            dialog.setVisible(true);
+
+
+            extractFile();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(form, FILE_READ_FAIL.getMessage());
         }
@@ -95,25 +90,37 @@ public class AnalyzeResultBtnListener implements ActionListener, BtnListener {
         readLineStr = readLineStr.substring(readLineStr.indexOf("]") + 1);
     }
 
-    // TODO 호출 서비스 아이디를 카운트 한다.
     private void cntServiceId() {
         String serviceId = readLineStr.substring(readLineStr.lastIndexOf("/") + 1, readLineStr.indexOf("?"));
         serviceIdCntMap.put(serviceId, serviceIdCntMap.getOrDefault(serviceId, 0) + 1);
         readLineStr = readLineStr.substring(readLineStr.indexOf("?") + 1);
     }
 
-    // TODO 호출 API KEY 를 카운트 한다.
     private void cntApiKey() {
         String apiKey = readLineStr.substring(0, readLineStr.indexOf("&"));
         apiKeyCntMap.put(apiKey, apiKeyCntMap.getOrDefault(apiKey, 0) + 1);
         readLineStr = readLineStr.substring(readLineStr.indexOf("]") + 1);
     }
 
-    // TODO 호출 웹 브라우저를 카운트 한다.
     private void cntBrowser() {
         String browser = readLineStr.substring(1, readLineStr.indexOf("]"));
         browserCntMap.put(browser, browserCntMap.getOrDefault(browser, 0) + 1);
         readLineStr = readLineStr.substring(readLineStr.indexOf("]") + 1);
+    }
+
+    // TODO 분석 결과를 FileDialog 에서 정한 경로로 저장 구현
+    private void extractFile() throws IOException {
+        String message = "This is a sample message.\n";
+
+        File file = new File("test1.txt");
+        FileWriter writer = null;
+        BufferedWriter bWriter = null;
+
+        writer = new FileWriter(file, true);
+        bWriter = new BufferedWriter(writer);
+
+        bWriter.write(message);
+        bWriter.flush();
     }
 
 }

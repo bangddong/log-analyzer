@@ -1,6 +1,6 @@
 package main.java.com.dhbang.listener;
 
-import main.java.com.dhbang.utils.FileExtensionFilter;
+import main.java.com.dhbang.utils.Util;
 import main.java.com.dhbang.view.MainForm;
 
 import javax.swing.*;
@@ -24,11 +24,8 @@ public class SelectFileBtnListener implements ActionListener, BtnListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        FileDialog fileDialog = new FileDialog(form, "파일을 선택해주세요.", FileDialog.LOAD);
+        FileDialog fileDialog = Util.getFileDialog(form, 0, "*.log");
         fileDialog.setVisible(true);
-        fileDialog.setName(null); // FileDialog 는 파일을 찾지 못할시 컴포넌트의 이름을 반환하기에 default 를 null 로 설정
-        fileDialog.setMultipleMode(false);
-        fileDialog.setFilenameFilter(FileExtensionFilter.of("log", ""));
 
         String selectedFileName = fileDialog.getName();
         String selectedFileDir = fileDialog.getDirectory();
